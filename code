@@ -1,0 +1,51 @@
+import pandas as pd
+import numpy as np
+
+data = pd.read_csv('data.csv')
+
+print(data)
+print(data.columns)
+print(data.info())
+print(data.describe())
+
+to_drop = ['Photo', 'Flag', 'Club Logo', 'Real Face'] # Nombre de columnas que no nos importan de la database y las vamos a quitar
+
+data.drop(to_drop, inplace=True, axis=1)
+
+overall = data.loc[data.Overall >= 85] # Filtramos a los jugadores con más o igual a 85 y tenemos un nuevo df
+
+print(overall)
+print(np.mean(overall.Age)) # Sacamos la media de la edad de los jugadores con este overall, es 28 años!
+
+print(overall.Nationality.value_counts()) # De qué nación son los mejores jugadores? Brazil, España, Alemania y Francia
+
+nation = data.Nationality.value_counts() # Cuántos jugadores hay por nación
+
+print(nation)
+
+for j in range(len(nation)):
+    print('Nation: ', nation.index[j], 'Total de jugadores: ', nation[j], ' Porcentaje del total: ', (nation[j]/nation.sum())*100, '%') # % jgdres x nacion
+
+right = overall.loc[overall['Preferred Foot'] == 'Right']
+left = overall.loc[overall['Preferred Foot'] == 'Left']
+
+
+print('Se tienen que de los 110 "mejores jugadores": ', len(right), ' son diestros, o sea: ', (len(right)/(len(right)+len(left)))*100, '%')
+print('Se tienen que de los 110 "mejores jugadores": ', len(left), ' son zurdos, o sea: ', (len(left)/(len(right)+len(left)))*100, '%')
+
+position = data.groupby('Position')
+
+for j in position.first().index:
+    print('El promedio de edad para ', j, ' es ', np.mean(data.loc[data.Position == j].Age), ' de estatura: ', np.mean(data.loc[data.Position == j].Height),
+          ' de peso: ', np.mean(data.loc[data.Position == j].Weight)) Los datos de height y weight tienen caracteres incompatibles, sólo dejaremos la edad
+    print('El promedio de edad para ', j, ' es ', np.mean(data.loc[data.Position == j].Age))
+
+position_overall = overall.groupby('Position')
+
+for j in position_overall.first().index:
+    print('Los mejores jugadores son de estas posiciones: ', j)
+
+club_overall = overall.groupby('Club')
+
+for j in club_overall.first().index:
+    print('Los mejores jugadores son de estos clubes: ', j)
